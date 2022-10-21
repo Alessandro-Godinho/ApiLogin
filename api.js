@@ -2,7 +2,7 @@ var mongo = require('mongodb');
 const express = require('express')
 const http = require('http');
 const { response } = require('express');
-const port = 3002
+const port = process.env.PORT
 const app = express()
 const jwt = require('jsonwebtoken');
 const { verify } = require('crypto');
@@ -11,8 +11,8 @@ const SECRET = 'ALESSANDRO'
 app.use(express.json());
 
 var MongoClient = require('mongodb').MongoClient;
-var url = "mongodb+srv://godinis22:36731249@teste.sncrx1j.mongodb.net/?retryWrites=true&w=majority";
-const client = new MongoClient(url)
+var DATABASE_URL  = "mongodb+srv://godinis22:36731249@teste.sncrx1j.mongodb.net/?retryWrites=true&w=majority";
+const client = new MongoClient(DATABASE_URL)
 var dbo = client.db("usuario") 
 
 app.get('/usuarios',verifyJWT, (req,response) => {
