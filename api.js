@@ -67,6 +67,8 @@ app.post('/usuario',(req,response) => {
 
 })
 
+app.get('/' ,(req, res) => {res.send("BEM VINDO A API DE LOGIN COM JWT")} )
+
   app.listen(port, function() {
     console.log(`Server is running at localhost:${port}`)
   })
