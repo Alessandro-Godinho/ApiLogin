@@ -1,0 +1,27 @@
+// MongoDB Playground
+// To disable this template go to Settings | MongoDB | Use Default Template For Playground.
+// Make sure you are connected to enable completions and to be able to run a playground.
+// Use Ctrl+Space inside a snippet or a string literal to trigger completions.
+
+// Select the database to use.
+use('gestao');
+
+// The drop() command destroys all data from a collection.
+// Make sure you run it against the correct database and collection.
+db.usuario.drop();
+
+// Insert a few documents into the sales collection.
+db.usuario.insertMany([
+  { '_id': 1, 'usuario': 'joao@gmail.com', 'senha': '23455'},
+  { '_id': 2, 'usuario': 'maria@yahoo.com', 'senha': '12345'},
+  { '_id': 3, 'usuario': 'vitor@hotmail.com', 'senha': '65987'},
+  { '_id': 4, 'usuario': 'marcelo@ig.com.br', 'senha': '35678'},
+  { '_id': 5, 'usuario': 'paula@uol.com.br', 'senha': '74258'},
+  { '_id': 6, 'usuario': 'bia@gmail.com', 'senha': '76900'},
+  { '_id': 7, 'usuario': 'coop@yahoo.com', 'senha': '09567'},
+  { '_id': 8, 'usuario': 'saude@gov.com.br', 'senha': '54112'},
+  { '_id': 9, 'usuario': 'andreia@hotmail.com', 'senha': '11554'},
+  { '_id': 10,'usuario': 'marcos@outlook.com', 'senha': '33245'},
+ 
+]);
+
