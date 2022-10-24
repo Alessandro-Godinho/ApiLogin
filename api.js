@@ -32,7 +32,7 @@ app.post('/usuario',(req,response) => {
     dbo.collection("usuario").findOne({usuario: req.body.usuario, senha: req.body.senha}).then(data => { 
         if(data != null)
         {
-            const token = jwt.sign({usuario: data._id} , SECRET, {expiresIn: 300})
+            const token = jwt.sign({usuario: data._id} , SECRET, {expiresIn: 3000})
             response.json({auth: true, token})
         }
         else {
@@ -65,12 +65,25 @@ app.get('/' ,(req, res) => {res.send("BEM VINDO A API DE LOGIN COM JWT V2")} )
   }
 
   app.get('/sistemas',verifyJWT, (req,response) => {
-   
-    const sistema = dbo.collection("sistema").find({}).toArray().then((data => {
+    
+    var query = { $and: [] };
+
+    if (req.query.usuario) { query.$and.push({usuario: req.query.usuario}); }
+    if (req.query.descricao) { query.$and.push({descricao: req.query.descricao}); }
+    if (req.query.senha) { query.$and.push({senha: req.query.senha}); }
+    if(query.$and.length > 0){
+
+        const sistema = dbo.collection("sistema").find(query).toArray().then((data => {
         response.json(data)
+        }))
+    }
+    else{
         
-    }))
-     
+        const sistema = dbo.collection("sistema").find({}).toArray().then((data => {
+        response.json(data)    
+        }))
+    }
+             
   })
 
 
