@@ -2,7 +2,7 @@ var mongo = require('mongodb');
 const express = require('express')
 const http = require('http');
 const { response } = require('express');
-const port = process.env.PORT // local:3002 servidor: process.env.PORT
+const port = 3002 // local:3002 servidor: process.env.PORT
 const app = express()
 const jwt = require('jsonwebtoken');
 const { verify } = require('crypto');
@@ -104,7 +104,7 @@ app.get('/' ,(req, res) => {res.send("BEM VINDO A API DE LOGIN COM JWT V3")} )
     } };
    
     const sistema = dbo.collection("sistema").updateOne(query, novosDados).then((data => {
-        response.json(response.data)      
+        response.json(req.body)      
     }))     
 })
 
@@ -116,7 +116,7 @@ app.post('/sistema', verifyJWT, (req,response) => {
             } 
            
             dbo.collection("sistema").insertOne(novosDados).then(data => {
-                response.json(response.data)
+                response.json(req.body)
            })   
     })
 
