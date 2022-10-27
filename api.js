@@ -2,7 +2,7 @@ var mongo = require('mongodb');
 const express = require('express')
 const http = require('http');
 const { response } = require('express');
-const port = process.env.PORT
+const port = process.env.PORT // local:3002 servidor: process.env.PORT
 const app = express()
 const jwt = require('jsonwebtoken');
 const { verify } = require('crypto');
@@ -12,6 +12,8 @@ var payload = {}
 app.use(express.json());
 
 var MongoClient = require('mongodb').MongoClient;
+var ObjectID = require('mongodb').ObjectId;
+
 var DATABASE_URL  = "mongodb+srv://godinis22:36731249@teste.sncrx1j.mongodb.net/?retryWrites=true&w=majority";
 const client = new MongoClient(DATABASE_URL)
 var dbo = client.db("gestao") 
@@ -27,13 +29,13 @@ app.put('/usuario/:id', verifyJWT, (req,response) => {
     }))     
 })
 
-app.post('/usuario',(req,response) => {
+app.post('/login',(req,response) => {
     console.log(req.body.usuario)
     dbo.collection("usuario").findOne({usuario: req.body.usuario, senha: req.body.senha}).then(data => { 
         if(data != null)
         {
             const token = jwt.sign({usuario: data._id} , SECRET, {expiresIn: 3000})
-            response.json({auth: true, token})
+            response.json({data, auth: true, token})
         }
         else {
 
@@ -44,7 +46,7 @@ app.post('/usuario',(req,response) => {
 
 })
 
-app.get('/' ,(req, res) => {res.send("BEM VINDO A API DE LOGIN COM JWT V2")} )
+app.get('/' ,(req, res) => {res.send("BEM VINDO A API DE LOGIN COM JWT V3")} )
 
   app.listen(port, function() {
     console.log(`Server is running at localhost:${port}`)
@@ -55,7 +57,6 @@ app.get('/' ,(req, res) => {res.send("BEM VINDO A API DE LOGIN COM JWT V2")} )
     jwt.verify(token, SECRET, (erro, decoded) => {
 
         if(erro){
-            console.log('token invalido')
             res.json({msg:'token ausente ou invalido'})
             return false
         }
@@ -88,13 +89,14 @@ app.get('/' ,(req, res) => {res.send("BEM VINDO A API DE LOGIN COM JWT V2")} )
 
 
   app.get('/sistema/:id',verifyJWT, (req,response) => {
-    const sistema = dbo.collection("sistema").findOne({descricao: req.params.id.toString()}).then((data => {
+    const sistema = dbo.collection("sistema").findOne({_id: ObjectID.createFromHexString(req.params.id)}).then((data => {
         response.json(data)     
     }))     
   })
 
   app.put('/sistema/:id', verifyJWT, (req,response) => {
-    const query = {descricao : req.params.id.toString()}  
+    const query = {_id :  ObjectID.createFromHexString(req.params.id)}
+    console.log("teste "+query._id)
     const novosDados = { $set: {
         descricao: req.body.descricao,
         usuario: req.body.usuario, 
@@ -102,14 +104,11 @@ app.get('/' ,(req, res) => {res.send("BEM VINDO A API DE LOGIN COM JWT V2")} )
     } };
    
     const sistema = dbo.collection("sistema").updateOne(query, novosDados).then((data => {
-        response.json(data)      
+        response.json(response.data)      
     }))     
 })
 
 app.post('/sistema', verifyJWT, (req,response) => {
-    dbo.collection("sistema").findOne({descricao: req.body.descricao}).then(data => { 
-        if(data == null)
-        {
             const novosDados = {
                 descricao: req.body.descricao,
                 usuario: req.body.usuario, 
@@ -117,22 +116,14 @@ app.post('/sistema', verifyJWT, (req,response) => {
             } 
            
             dbo.collection("sistema").insertOne(novosDados).then(data => {
-                response.json('cadastrado com sucesso')
-           })
-        }
-        else {
-
-            response.json({msg: 'sistema já cadastrado'})  
-
-        }
+                response.json(response.data)
+           })   
     })
-
-})
 
   app.delete('/sistema/:id',(req,response) => {
     console.log(req.params.id)
    
-    const sistema = dbo.collection("sistema").deleteOne({descricao: req.params.id.toString()}).then((data => {
-        response.json({msg:"apagado com sucesso"})      
+    const sistema = dbo.collection("sistema").deleteOne({_id: ObjectID.createFromHexString(req.params.id)}).then((data => {
+        response.json({msg: true})      
   }))     
 })
