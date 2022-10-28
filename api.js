@@ -22,7 +22,12 @@ app.put('/usuario/:id', verifyJWT, (req,response) => {
     const query = {_id : parseInt(req.params.id)}
     console.log(req.body.usuario)
   
-    const novosDados = { $set: {usuario: req.body.usuario, senha: req.body.senha} };
+    const novosDados = { $set: {
+        usuario: req.body.usuario, 
+        senha: req.body.senha,
+        tipo: req.body.tipo
+    } 
+};
    
     const usuario = dbo.collection("usuario").updateOne(query, novosDados).then((data => {
         response.json(data)      
@@ -58,7 +63,7 @@ app.post('/login',(req,response) => {
 
 })
 
-app.get('/' ,(req, res) => {res.send("BEM VINDO A API DE LOGIN COM JWT V3")} )
+app.get('/' ,(req, res) => {res.send("BEM VINDO A API DE LOGIN COM JWT V4")} )
 
   app.listen(port, function() {
     console.log(`Server is running at localhost:${port}`)
