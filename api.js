@@ -29,6 +29,18 @@ app.put('/usuario/:id', verifyJWT, (req,response) => {
     }))     
 })
 
+app.post('/usuario', verifyJWT, (req,response) => {
+    const novosDados = {
+        usuario: req.body.usuario, 
+        senha: req.body.senha,
+        tipo: req.body.tipo
+    } 
+   
+    dbo.collection("usuario").insertOne(novosDados).then(data => {
+        response.json(req.body)
+   })   
+})
+
 app.post('/login',(req,response) => {
     console.log(req.body.usuario)
     dbo.collection("usuario").findOne({usuario: req.body.usuario, senha: req.body.senha}).then(data => { 
