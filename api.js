@@ -19,7 +19,7 @@ const client = new MongoClient(DATABASE_URL)
 var dbo = client.db("gestao") 
 
 app.put('/usuario/:id', verifyJWT, (req,response) => {
-    const query = {_id : parseInt(req.params.id)}
+    const query = {_id :  ObjectID.createFromHexString(req.params.id)}
     console.log(req.body.usuario)
   
     const novosDados = { $set: {
