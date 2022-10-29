@@ -2,11 +2,10 @@ var mongo = require('mongodb');
 const express = require('express')
 const http = require('http');
 const { response } = require('express');
-const port = process.env.PORT // local:3002 servidor: process.env.PORT
+const port = 3002 // local:3002 servidor: process.env.PORT
 const app = express()
 const jwt = require('jsonwebtoken');
-const { verify } = require('crypto');
-
+const crypto = require("crypto");
 const SECRET = 'ALESSANDRO'
 var payload = {}
 app.use(express.json());
@@ -18,18 +17,36 @@ var DATABASE_URL  = "mongodb+srv://godinis22:36731249@teste.sncrx1j.mongodb.net/
 const client = new MongoClient(DATABASE_URL)
 var dbo = client.db("gestao") 
 
+const DADOS_CRIPTOGRAFAR = {
+    algoritmo : "aes256",
+    segredo : "chaves",
+    tipo : "hex"
+};
+
+function criptografar(senha) {
+    const cipher = crypto.createCipher(DADOS_CRIPTOGRAFAR.algoritmo, DADOS_CRIPTOGRAFAR.segredo);
+    cipher.update(senha);
+    return cipher.final(DADOS_CRIPTOGRAFAR.tipo);
+};
+
+function descriptografar(senha) {
+    const decipher = crypto.createDecipher(DADOS_CRIPTOGRAFAR.algoritmo, DADOS_CRIPTOGRAFAR.segredo);
+    decipher.update(senha, DADOS_CRIPTOGRAFAR.tipo);
+    return decipher.final();
+};
+
 app.put('/usuario/:id', verifyJWT, (req,response) => {
     const query = {_id :  ObjectID.createFromHexString(req.params.id)}
     console.log(req.body.usuario)
   
     const novosDados = { $set: {
         usuario: req.body.usuario, 
-        senha: req.body.senha,
+        senha: criptografar(req.body.senha),
         tipo: req.body.tipo
     } 
 };
    
-    const usuario = dbo.collection("usuario").updateOne(query, novosDados).then((data => {
+        dbo.collection("usuario").updateOne(query, novosDados).then((data => {
         response.json(data)      
     }))     
 })
@@ -37,18 +54,19 @@ app.put('/usuario/:id', verifyJWT, (req,response) => {
 app.post('/usuario', verifyJWT, (req,response) => {
     const novosDados = {
         usuario: req.body.usuario, 
-        senha: req.body.senha,
+        senha: criptografar(req.body.senha),
         tipo: req.body.tipo
     } 
-   
-    dbo.collection("usuario").insertOne(novosDados).then(data => {
-        response.json(req.body)
+    console.log(novosDados.senha);
+    dbo.collection("usuario").insertOne(novosDados).then(() => {
+        response.json(novosDados)
    })   
 })
 
 app.post('/login',(req,response) => {
-    console.log(req.body.usuario)
-    dbo.collection("usuario").findOne({usuario: req.body.usuario, senha: req.body.senha}).then(data => { 
+    const pass = descriptografar(req.body.senha)
+    console.log('senha descrip... '+pass);
+    dbo.collection("usuario").findOne({usuario: req.body.usuario, senha: pass}).then(data => { 
         if(data != null)
         {
             const token = jwt.sign({usuario: data._id} , SECRET, {expiresIn: 3000})
@@ -63,7 +81,7 @@ app.post('/login',(req,response) => {
 
 })
 
-app.get('/' ,(req, res) => {res.send("BEM VINDO A API DE LOGIN COM JWT V4")} )
+app.get('/' ,(req, res) => {res.send("BEM VINDO A API DE LOGIN COM JWT V5")} )
 
   app.listen(port, function() {
     console.log(`Server is running at localhost:${port}`)
@@ -96,7 +114,6 @@ app.get('/' ,(req, res) => {res.send("BEM VINDO A API DE LOGIN COM JWT V4")} )
 
     if(query.$and.length > 0){
 
-        console.log("entrou aqui");
         const sistema = dbo.collection("sistema").find(query).toArray().then((data => {
         response.json(data)
         }))
