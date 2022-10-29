@@ -61,7 +61,7 @@ app.post('/login',(req,response) => {
         console.log('retorno '+data); 
         if(data != null)
         {
-            const token = jwt.sign({usuario: data._id} , SECRET, {expiresIn: 300000})
+            const token = jwt.sign({usuario: data._id} , SECRET, {expiresIn: 3000})
             response.json({data, auth: true, token})
         }
         else {
@@ -73,7 +73,7 @@ app.post('/login',(req,response) => {
 
 })
 
-app.get('/' ,(req, res) => {res.send("BEM VINDO A API DE LOGIN COM JWT V5")} )
+app.get('/' ,(req, res) => {res.send("BEM VINDO A API DE LOGIN COM JWT V6")} )
 
   app.listen(port, function() {
     console.log(`Server is running at localhost:${port}`)
