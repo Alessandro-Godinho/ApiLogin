@@ -15,24 +15,16 @@ var DATABASE_URL  = "mongodb+srv://godinis22:36731249@teste.sncrx1j.mongodb.net/
 const client = new MongoClient(DATABASE_URL)
 var dbo = client.db("gestao") 
 
-const DADOS_CRIPTOGRAFAR = {
-    algoritmo : "aes256",
-    segredo : "chaves",
-    tipo : "hex"
-};
+const key = crypto.randomBytes(32);
+const iv = crypto.randomBytes(16);
 
-function criptografar(senha) {
-    const cipher = crypto.createCipher(DADOS_CRIPTOGRAFAR.algoritmo, DADOS_CRIPTOGRAFAR.segredo);
-    cipher.update(senha);
-    return cipher.final(DADOS_CRIPTOGRAFAR.tipo);
-};
-
-function descriptografar(senha) {
-    const decipher = crypto.createDecipher(DADOS_CRIPTOGRAFAR.algoritmo, DADOS_CRIPTOGRAFAR.segredo);
-    decipher.update(senha, DADOS_CRIPTOGRAFAR.tipo);
-    return decipher.final();
-};
-
+function criptografar(text) {
+    let cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(key), iv);
+    let encrypted = cipher.update(text);
+    encrypted = Buffer.concat([encrypted, cipher.final()]);
+    return encrypted.toString('hex') 
+   }
+   
 app.put('/usuario/:id', verifyJWT, (req,response) => {
     const query = {_id :  ObjectID.createFromHexString(req.params.id)}
     console.log(req.body.usuario)
@@ -62,12 +54,14 @@ app.post('/usuario', verifyJWT, (req,response) => {
 })
 
 app.post('/login',(req,response) => {
-    const pass = descriptografar(req.body.senha)
-    console.log('senha descrip... '+pass);
-    dbo.collection("usuario").findOne({usuario: req.body.usuario, senha: pass}).then(data => { 
+    const pass = criptografar(req.body.senha)
+    //const pass = descriptografar(encript)
+    console.log('senha descrip... '+JSON.stringify(pass));
+    dbo.collection("usuario").findOne({usuario: req.body.usuario, senha: pass}).then(data => {
+        console.log('retorno '+data); 
         if(data != null)
         {
-            const token = jwt.sign({usuario: data._id} , SECRET, {expiresIn: 3000})
+            const token = jwt.sign({usuario: data._id} , SECRET, {expiresIn: 300000})
             response.json({data, auth: true, token})
         }
         else {
@@ -98,7 +92,7 @@ app.get('/' ,(req, res) => {res.send("BEM VINDO A API DE LOGIN COM JWT V5")} )
     })
   }
 
-  app.get('/sistemas',verifyJWT, (req,response) => {
+  app.get('/sistemas',verifyJWT, (req) => {
     
     var query = { $and: [] };
 
@@ -108,7 +102,6 @@ app.get('/' ,(req, res) => {res.send("BEM VINDO A API DE LOGIN COM JWT V5")} )
 
     let page = req.query.page;
     let limit = 3;
-    let skip = limit * (page - 1);
 
     if(query.$and.length > 0){
 
@@ -120,17 +113,12 @@ app.get('/' ,(req, res) => {res.send("BEM VINDO A API DE LOGIN COM JWT V5")} )
   })
 
 
-  app.get('/sistema/:id',verifyJWT, (req,response) => {
+  app.get('/sistema/:id',verifyJWT, () => {
   })
 
-  app.put('/sistema/:id', verifyJWT, (req,response) => {
+  app.put('/sistema/:id', verifyJWT, (req) => {
     const query = {_id :  ObjectID.createFromHexString(req.params.id)}
     console.log("teste "+query._id)
-    const novosDados = { $set: {
-        descricao: req.body.descricao,
-        usuario: req.body.usuario, 
-        senha: req.body.senha
-    } };
    
 })
 
@@ -146,7 +134,7 @@ app.post('/sistema', verifyJWT, (req,response) => {
            })   
     })
 
-  app.delete('/sistema/:id',(req,response) => {
+  app.delete('/sistema/:id',(req) => {
     console.log(req.params.id)
    
 })
