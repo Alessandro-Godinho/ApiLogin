@@ -1,6 +1,6 @@
 const express = require('express')
 const { response } = require('express');
-const port = process.env.PORT // local:3002 servidor: process.env.PORT
+const port =  process.env.PORT // local:3002 servidor: process.env.PORT
 const app = express()
 const jwt = require('jsonwebtoken');
 const crypto = require("crypto");
@@ -73,7 +73,7 @@ app.post('/login',(req,response) => {
 
 })
 
-app.get('/' ,(req, res) => {res.send("BEM VINDO A API DE LOGIN COM JWT V6")} )
+app.get('/' ,(req, res) => {res.send("BEM VINDO A API DE LOGIN COM JWT V7")} )
 
   app.listen(port, function() {
     console.log(`Server is running at localhost:${port}`)
@@ -92,7 +92,7 @@ app.get('/' ,(req, res) => {res.send("BEM VINDO A API DE LOGIN COM JWT V6")} )
     })
   }
 
-  app.get('/sistemas',verifyJWT, (req) => {
+  app.get('/sistemas',verifyJWT, (req,response) => {
     
     var query = { $and: [] };
 
@@ -101,13 +101,21 @@ app.get('/' ,(req, res) => {res.send("BEM VINDO A API DE LOGIN COM JWT V6")} )
     if (req.query.senha) { query.$and.push({senha: req.query.senha}); }
 
     let page = req.query.page;
-    let limit = 3;
+    let limit = req.params.limit;
+    let skip = limit * (page - 1);
 
     if(query.$and.length > 0){
 
+        console.log("entrou aqui");
+        const sistema = dbo.collection("sistema").find(query).toArray().then((data => {
+        response.json(data)
+        }))
     }
     else{
         
+        const sistema = dbo.collection("sistema").find({}).skip(skip).limit(limit).toArray().then((data => {
+        response.json(data)    
+        }))
     }
              
   })
