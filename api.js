@@ -1,6 +1,6 @@
 const express = require('express')
 const { response } = require('express');
-const port =  process.env.PORT // local:3002 servidor: process.env.PORT
+const port =  3002 // local:3002 servidor: process.env.PORT
 const app = express()
 const jwt = require('jsonwebtoken');
 const crypto = require("crypto");
@@ -101,8 +101,8 @@ app.get('/' ,(req, res) => {res.send("BEM VINDO A API DE LOGIN COM JWT V7")} )
     if (req.query.senha) { query.$and.push({senha: req.query.senha}); }
 
     let page = req.query.page;
-    let limit = req.params.limit;
-    let skip = limit * (page - 1);
+    let limit = parseInt(req.query.limit);
+    let skip = parseInt(limit) * (page - 1);
 
     if(query.$and.length > 0){
 
