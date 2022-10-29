@@ -1,8 +1,6 @@
-var mongo = require('mongodb');
 const express = require('express')
-const http = require('http');
 const { response } = require('express');
-const port = 3002 // local:3002 servidor: process.env.PORT
+const port = process.env.PORT // local:3002 servidor: process.env.PORT
 const app = express()
 const jwt = require('jsonwebtoken');
 const crypto = require("crypto");
@@ -114,24 +112,15 @@ app.get('/' ,(req, res) => {res.send("BEM VINDO A API DE LOGIN COM JWT V5")} )
 
     if(query.$and.length > 0){
 
-        const sistema = dbo.collection("sistema").find(query).toArray().then((data => {
-        response.json(data)
-        }))
     }
     else{
         
-        const sistema = dbo.collection("sistema").find({}).skip(skip).limit(limit).toArray().then((data => {
-        response.json(data)    
-        }))
     }
              
   })
 
 
   app.get('/sistema/:id',verifyJWT, (req,response) => {
-    const sistema = dbo.collection("sistema").findOne({_id: ObjectID.createFromHexString(req.params.id)}).then((data => {
-        response.json(data)     
-    }))     
   })
 
   app.put('/sistema/:id', verifyJWT, (req,response) => {
@@ -143,9 +132,6 @@ app.get('/' ,(req, res) => {res.send("BEM VINDO A API DE LOGIN COM JWT V5")} )
         senha: req.body.senha
     } };
    
-    const sistema = dbo.collection("sistema").updateOne(query, novosDados).then((data => {
-        response.json(req.body)      
-    }))     
 })
 
 app.post('/sistema', verifyJWT, (req,response) => {
@@ -155,7 +141,7 @@ app.post('/sistema', verifyJWT, (req,response) => {
                 senha: req.body.senha
             } 
            
-            dbo.collection("sistema").insertOne(novosDados).then(data => {
+            dbo.collection("sistema").insertOne(novosDados).then(() => {
                 response.json(req.body)
            })   
     })
@@ -163,7 +149,4 @@ app.post('/sistema', verifyJWT, (req,response) => {
   app.delete('/sistema/:id',(req,response) => {
     console.log(req.params.id)
    
-    const sistema = dbo.collection("sistema").deleteOne({_id: ObjectID.createFromHexString(req.params.id)}).then((data => {
-        response.json({msg: true})      
-  }))     
 })
