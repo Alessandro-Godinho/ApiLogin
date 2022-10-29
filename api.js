@@ -89,15 +89,21 @@ app.get('/' ,(req, res) => {res.send("BEM VINDO A API DE LOGIN COM JWT V4")} )
     if (req.query.usuario) { query.$and.push({usuario: req.query.usuario}); }
     if (req.query.descricao) { query.$and.push({descricao: req.query.descricao}); }
     if (req.query.senha) { query.$and.push({senha: req.query.senha}); }
+
+    let page = req.query.page;
+    let limit = 3;
+    let skip = limit * (page - 1);
+
     if(query.$and.length > 0){
 
+        console.log("entrou aqui");
         const sistema = dbo.collection("sistema").find(query).toArray().then((data => {
         response.json(data)
         }))
     }
     else{
         
-        const sistema = dbo.collection("sistema").find({}).toArray().then((data => {
+        const sistema = dbo.collection("sistema").find({}).skip(skip).limit(limit).toArray().then((data => {
         response.json(data)    
         }))
     }
