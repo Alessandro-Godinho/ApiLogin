@@ -1,6 +1,6 @@
 const express = require('express')
 const { response } = require('express');
-const port =  process.env.PORT // local:3002 servidor: process.env.PORT
+const port =  3002 // local:3002 servidor: process.env.PORT
 const app = express()
 const jwt = require('jsonwebtoken');
 const crypto = require("crypto");
@@ -15,15 +15,17 @@ var DATABASE_URL  = "mongodb+srv://godinis22:36731249@teste.sncrx1j.mongodb.net/
 const client = new MongoClient(DATABASE_URL)
 var dbo = client.db("gestao") 
 
-const key = crypto.randomBytes(32);
-const iv = crypto.randomBytes(16);
+const DADOS_CRIPTOGRAFAR = {
+    algoritmo : "aes256",
+    segredo : "chaves",
+    tipo : "hex"
+};
 
-function criptografar(text) {
-    let cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(key), iv);
-    let encrypted = cipher.update(text);
-    encrypted = Buffer.concat([encrypted, cipher.final()]);
-    return encrypted.toString('hex') 
-   }
+function criptografar(senha) {
+    const cipher = crypto.createCipher(DADOS_CRIPTOGRAFAR.algoritmo, DADOS_CRIPTOGRAFAR.segredo);
+    cipher.update(senha);
+    return cipher.final(DADOS_CRIPTOGRAFAR.tipo);
+};
    
 app.put('/usuario/:id', verifyJWT, (req,response) => {
     const query = {_id :  ObjectID.createFromHexString(req.params.id)}
@@ -73,7 +75,7 @@ app.post('/login',(req,response) => {
 
 })
 
-app.get('/' ,(req, res) => {res.send("BEM VINDO A API DE LOGIN COM JWT V7")} )
+app.get('/' ,(req, res) => {res.send("BEM VINDO A API DE LOGIN COM JWT V8")} )
 
   app.listen(port, function() {
     console.log(`Server is running at localhost:${port}`)
@@ -103,20 +105,16 @@ app.get('/' ,(req, res) => {res.send("BEM VINDO A API DE LOGIN COM JWT V7")} )
     let page = req.query.page;
     let limit = parseInt(req.query.limit);
     let skip = parseInt(limit) * (page - 1);
-
-    if(query.$and.length > 0){
-
-        console.log("entrou aqui");
-        const sistema = dbo.collection("sistema").find(query).toArray().then((data => {
-        response.json(data)
-        }))
+    if(query.$and.length == 0){
+        query = {}
+        console.log(`usuario: ${req.query.usuario} descricao: ${req.query.descricao} senha: ${req.query.senha}`);
     }
-    else{
-        
-        const sistema = dbo.collection("sistema").find({}).skip(skip).limit(limit).toArray().then((data => {
-        response.json(data)    
-        }))
-    }
+        dbo.collection("sistema").find(query).count().then(count=>{
+            dbo.collection("sistema").find(query).skip(skip).limit(limit).toArray().then((data => {
+                response.json({data, total: count % limit == 0 ? count/limit : (Math.floor(count/limit)) + 1 })    
+            }))      
+            
+        })
              
   })
 
