@@ -103,7 +103,7 @@ app.get('/' ,(req, res) => {res.send("BEM VINDO A API DE LOGIN COM JWT V9")} )
     if (req.query.senha) { query.$and.push({senha: req.query.senha}); }
 
     let page = req.query.page;
-    let limit = parseInt(10)//parseInt(req.query.limit);
+    let limit = parseInt(req.query.limit);
     let skip = parseInt(limit) * (page - 1);
     if(query.$and.length == 0){
         query = {}
