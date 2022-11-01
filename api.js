@@ -63,7 +63,7 @@ app.post('/login',(req,response) => {
         console.log('retorno '+data); 
         if(data != null)
         {
-            const token = jwt.sign({usuario: data._id} , SECRET, {expiresIn: 3000})
+            const token = jwt.sign({usuario: data._id} , SECRET, {expiresIn: 1000})
             response.json({data, auth: true, token})
         }
         else {
