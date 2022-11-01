@@ -127,9 +127,17 @@ app.get('/' ,(req, res) => {res.send("BEM VINDO A API DE LOGIN COM JWT V9")} )
 })
   app.put('/sistema/:id', verifyJWT, (req) => {
     const query = {_id :  ObjectID.createFromHexString(req.params.id)}
-    console.log("teste "+query._id)
-   
-})
+
+    const novosDados = {
+        descricao: req.body.descricao,
+        usuario: req.body.usuario, 
+        senha: req.body.senha
+    } 
+
+    dbo.collection("sistema").updateOne(query,novosDados).then(() => {
+        response.json("Excluído com Sucesso!") 
+    })   
+})   
 
 app.post('/sistema', verifyJWT, (req,response) => {
             const novosDados = {
