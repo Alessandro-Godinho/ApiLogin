@@ -120,6 +120,9 @@ app.get('/' ,(req, res) => {res.send("BEM VINDO A API DE LOGIN COM JWT V9")} )
 
 
   app.get('/sistema/:id',verifyJWT, () => {
+    const query = {_id :  ObjectID.createFromHexString(req.params.id)}
+    dbo.collection("sistema").findOne(query).then((data) => {
+    response.json(data) 
   })
 
   app.put('/sistema/:id', verifyJWT, (req) => {
