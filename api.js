@@ -1,6 +1,6 @@
 const express = require('express')
 const { response } = require('express');
-const port =  process.env.PORT // local:3002 servidor: process.env.PORT
+const port =  3002// local:3002 servidor: process.env.PORT
 const app = express()
 const jwt = require('jsonwebtoken');
 const crypto = require("crypto");
@@ -125,19 +125,20 @@ app.get('/' ,(req, res) => {res.send("BEM VINDO A API DE LOGIN COM JWT V9")} )
     response.json(data) 
   })
 })
-  app.put('/sistema/:id', verifyJWT, (req) => {
-    const query = {_id :  ObjectID.createFromHexString(req.params.id)}
 
-    const novosDados = {
-        descricao: req.body.descricao,
+  app.put('/sistema/:id', verifyJWT, (req,response) => {
+    console.log("teste1");
+
+    const query = {_id :  ObjectID.createFromHexString(req.params.id)}  
+    const novosDados = { $set: {
         usuario: req.body.usuario, 
-        senha: req.body.senha
+        senha: req.body.senha,
+        descricao: req.body.descricao
     } 
-
-    dbo.collection("sistema").updateOne(query,novosDados).then(() => {
-        response.json("Excluído com Sucesso!") 
-    })   
-})   
+};
+        console.log("teste");
+        dbo.collection("sistema").updateOne(query, novosDados).then(response.json(req.body))     
+})
 
 app.post('/sistema', verifyJWT, (req,response) => {
             const novosDados = {
