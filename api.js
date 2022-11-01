@@ -75,7 +75,7 @@ app.post('/login',(req,response) => {
 
 })
 
-app.get('/' ,(req, res) => {res.send("BEM VINDO A API DE LOGIN COM JWT V9")} )
+app.get('/' ,(req, res) => {res.send("BEM VINDO A API DE LOGIN COM JWT V10")} )
 
   app.listen(port, function() {
     console.log(`Server is running at localhost:${port}`)
