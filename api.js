@@ -1,6 +1,6 @@
 const express = require('express')
 const { response } = require('express');
-const port =  process.env.PORT // local:3002 servidor: process.env.PORT
+const port =  3002 // local:3002 servidor: process.env.PORT
 const app = express()
 const jwt = require('jsonwebtoken');
 const crypto = require("crypto");
@@ -75,7 +75,7 @@ app.post('/login',(req,response) => {
 
 })
 
-app.get('/' ,(req, res) => {res.send("BEM VINDO A API DE LOGIN COM JWT V8")} )
+app.get('/' ,(req, res) => {res.send("BEM VINDO A API DE LOGIN COM JWT V9")} )
 
   app.listen(port, function() {
     console.log(`Server is running at localhost:${port}`)
@@ -103,7 +103,7 @@ app.get('/' ,(req, res) => {res.send("BEM VINDO A API DE LOGIN COM JWT V8")} )
     if (req.query.senha) { query.$and.push({senha: req.query.senha}); }
 
     let page = req.query.page;
-    let limit = parseInt(req.query.limit);
+    let limit = parseInt(10)//parseInt(req.query.limit);
     let skip = parseInt(limit) * (page - 1);
     if(query.$and.length == 0){
         query = {}
@@ -140,7 +140,10 @@ app.post('/sistema', verifyJWT, (req,response) => {
            })   
     })
 
-  app.delete('/sistema/:id',(req) => {
-    console.log(req.params.id)
-   
+  app.delete('/sistema/:id', verifyJWT,(req, response) => {
+        const query = {_id :  ObjectID.createFromHexString(req.params.id)}
+
+        dbo.collection("sistema").deleteOne(query).then(() => {
+        response.json("Excluído com Sucesso!") 
+    })   
 })
