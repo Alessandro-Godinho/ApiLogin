@@ -55,7 +55,7 @@ app.post('/usuario', verifyJWT, (req,response) => {
    })   
 })
 
-app.post('/login',(req,response) => {
+app.post('/login/',(req,response) => {
     const pass = criptografar(req.body.senha)
     //const pass = descriptografar(encript)
     console.log('senha descrip... '+JSON.stringify(pass));
