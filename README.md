@@ -6,7 +6,7 @@ utilização de criptogria
 jwt
 e validação do token.
 mongoDB. \n
-projeto front end da aplicação: \n
+projeto front end da aplicação: <br>
 https://github.com/Alessandro-Godinho/MyLogin
 projeto completo em: 
 https://vercel.com/alessandro-godinho/my-login/deployments
