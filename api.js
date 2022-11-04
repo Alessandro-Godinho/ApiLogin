@@ -3,6 +3,8 @@ const { response } = require('express');
 const port =  process.env.PORT// local:3002 servidor: process.env.PORT
 const app = express()
 const jwt = require('jsonwebtoken');
+var cors = require('cors')
+
 const crypto = require("crypto");
 const SECRET = 'ALESSANDRO'
 var payload = {}
@@ -26,6 +28,9 @@ function criptografar(senha) {
     cipher.update(senha);
     return cipher.final(DADOS_CRIPTOGRAFAR.tipo);
 };
+
+app.use(cors())
+
    
 app.put('/usuario/:id', verifyJWT, (req,response) => {
     const query = {_id :  ObjectID.createFromHexString(req.params.id)}
